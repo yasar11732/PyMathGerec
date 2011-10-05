@@ -1,0 +1,32 @@
+Python'da bazı metematik işlemleri için kısayol fonksiyonları.
+Çok denenmedi, pek güven olmayabilir.
+Hız açısından bir sanat eseri oldu gibi.
+Hafıza kullanımını optimize etmedim, ama çok sıkıntı çıkarmaz heralde.
+
+Her sistem için uygun olmayabilir (bkz: -> windows <-) (ama çalışması da muhtemel.)
+C ile yazıldığı için, derlemek için C derleyicisi gerekecek (bkz: -> gcc <-)
+
+Kurulum:
+
+python setup.py install
+
+Kullanmak için:
+
+Tek bir modülden oluşuyor, import etmek için:
+
+import mathGerecleri
+
+Fonksiyonlar:
+
+primes(int) -> argüman olarak 4milyondan küçük 1'den büyük bir sayı alıyor. (int-long)
+               o sayıya kadar olan asalları hesaplıyor. Benim makinede (eski laptop)
+               4 milyona kadar 0.2 saniye sürüyor hesaplaması. Bu arada dönüş değeri
+               her zaman long türünde.
+
+obeb(int, int, ...) -> argüman olarak int veya long türünde rasgele miktarda argüman alıyor.
+                    sayılardan oluşan bir listeyi argüman olarak vermek için:
+                    a = [23,543,12,54]
+                    obeb(*a) # a'nın elemanları ayrı argümanlar olarak gönderir... 
+                    Dönüş değeri long türünde.
+                    
+okek() -> yukardaki'nin okek'lisi.
