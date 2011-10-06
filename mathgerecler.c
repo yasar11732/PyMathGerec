@@ -162,29 +162,28 @@ static PyObject *
 math_primes(PyObject *self, PyObject *args)
 {
     PyObject *m;
-    long ust_limit;
-    int arr_size;
+    Py_ssize_t arr_size;
     double kok;
-    int i;
-    int j;
+    unsigned int i;
+    unsigned int j;
 
-    if(!PyArg_ParseTuple(args,"k", &ust_limit))
+    if(!PyArg_ParseTuple(args,"n", &arr_size))
         return NULL;
 
-    if(ust_limit <= 1) {
-        PyErr_SetString(PyExc_ValueError,"Value must be bigger than 1");
-        return NULL;
-    }
-    if(ust_limit > 4200000) {
-        PyErr_SetString(PyExc_ValueError,"Given value is too big!");
-        return NULL;
-    }
-    m = PyList_New(1);
-    PyList_SET_ITEM(m,0,PyLong_FromLong(2L));
+    m = PyList_New(0);
+    if(arr_size <= 1)
+        return m;
+    
+    PyList_Append(m, Py_BuildValue("k",2));
+    kok = sqrt((double)arr_size);
 
-    arr_size = ((ust_limit + 1) / 2) - 1;
-    kok = sqrt((double)ust_limit);
-    long numbs[arr_size];
+    arr_size = ((arr_size + 1) / 2) - 1;
+    
+    
+    
+    
+    unsigned long *numbs = malloc(arr_size * sizeof(unsigned long));
+    
     
     for(i=0; i < arr_size;i++){
         numbs[i] = 2 * (i + 1) + 1;
@@ -193,18 +192,24 @@ math_primes(PyObject *self, PyObject *args)
     for(i=0;i< arr_size;i++) {
         if (numbs[i] > kok) break;
         if (numbs[i]) {
-            for (j = i + numbs[i];j<arr_size;j += numbs[i])
+            
+            for (j = i + numbs[i];j<arr_size;j += numbs[i]) {
+                
+                
                 numbs[j] = 0;
+            }
         }
     }
 
     for(i=0;i<arr_size;i++){
         if (numbs[i])
-            if(PyList_Append(m,PyLong_FromLong(numbs[i])) == -1) {
+            if(PyList_Append(m,Py_BuildValue("k",numbs[i])) == -1) {
             Py_DECREF(m);
+            free(numbs);
             return NULL;
             }
-    }
+    } 
+    free(numbs);
     return m;
 
 }
