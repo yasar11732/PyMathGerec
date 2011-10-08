@@ -2,21 +2,24 @@
 #include <math.h>
 
 struct bigcouples {
-unsigned long long first;
-unsigned long long second;
+unsigned long first;
+unsigned long second;
 };
 
-void swap(struct bigcouples *couple){
-    unsigned long long backup;
+
+void
+swap(struct bigcouples *couple){
+    unsigned long backup;
     backup = couple->first;
     couple->first = couple->second;
     couple->second = backup;
 }
 
-void bubbleSort(unsigned long long numbers[], int array_size)
+void
+bubbleSort(unsigned long *numbers, Py_ssize_t array_size)
 {
-  int i, j;
-  unsigned long long temp;
+  Py_ssize_t i, j;
+  unsigned long temp;
  
   for (i = (array_size - 1); i > 0; i--)
   {
@@ -33,13 +36,14 @@ void bubbleSort(unsigned long long numbers[], int array_size)
 }
 
 
-unsigned long long obeb_couples(struct bigcouples couple) {
+unsigned long
+obeb_couples(struct bigcouples couple) {
 /* Finds bigges common divedor of to numbers*/
     if(couple.first == 0) {
         if (couple.second)
             return couple.second;
         else
-            return 1L;
+            return 1;
     }
     if(couple.second == 0)
         return couple.first;
@@ -47,51 +51,52 @@ unsigned long long obeb_couples(struct bigcouples couple) {
     while(1) {
         if (couple.second > couple.first)
             swap(&couple);
-        couple.first = fmod(couple.first, couple.second);
-        if(!couple.first)
-            return couple.second;
+        couple.first = couple.first % couple.second;
+        if(!couple.first) {
+            return couple.second; }
     }
 
 }
 
-unsigned long long okek_couples(struct bigcouples couple) {
+unsigned long
+okek_couples(struct bigcouples couple) {
     /* Common divident of two numbers*/
-    return (couple.first/obeb_couples(couple)) * couple.second;
+    unsigned long up_part = couple.first/obeb_couples(couple);
+    unsigned long result = up_part * couple.second;
+    /* Check for overflow */
+    if (result < up_part || result < couple.second) {
+        PyErr_SetString(PyExc_OverflowError,"Values too large to calculate");
+        return NULL;
+    }
+    return  result;
 }
 
-int ParseArguments(unsigned long long arr[],int size, PyObject *args) {
+int
+ParseArguments(unsigned long arr[],Py_ssize_t size, PyObject *args) {
     /* Get arbitrary number of positive numbers from Py_Tuple */
-    int i;
-    unsigned long long typeCheck;
-    PyObject *temp_p;
+    Py_ssize_t i;
+    PyObject *temp_p, *temp_p2;
 
 
     for (i=0;i<size;i++) {
         temp_p = PyTuple_GetItem(args,i);
-        if (PyInt_Check(temp_p)) {
-            typeCheck = (unsigned long long)PyInt_AsLong(temp_p);
-            if(typeCheck == -1.0 && PyErr_Occurred())
-                return NULL;
+        if(temp_p == NULL) {return NULL;}
+
+        /* Check if temp_p is numeric */
+        if (PyNumber_Check(temp_p) != 1) {
+            PyErr_SetString(PyExc_TypeError,"Non-numeric argument.");
+            return NULL;
         }
 
-        else if (PyLong_Check(temp_p)) {
-            typeCheck = (unsigned long long)PyLong_AsLong(temp_p);
-            if(typeCheck == -1.0 && PyErr_Occurred())
-                return NULL;
+        /* Convert number to python long and than C unsigned long */
+        temp_p2 = PyNumber_Long(temp_p);
+        arr[i] = PyLong_AsUnsignedLong(temp_p2);
+        Py_DECREF(temp_p2);
+        if (arr[i] == 0) {
+            PyErr_SetString(PyExc_ValueError,"Zero doesn't allowed as argument.");
+            return NULL;
         }
-
-        else {
-            PyErr_SetString(PyExc_ValueError,"All arguments need to be either int or long");
-            return 0;
-        }
-
-        if (typeCheck < 1){
-            PyErr_SetString(PyExc_ValueError,"All argument must be bigger than 0");
-            return 0;
-        }
-
-        arr[i] = typeCheck;
-
+        if (PyErr_Occurred()) {return NULL; }
     }
 
     return 1;
@@ -101,30 +106,40 @@ int ParseArguments(unsigned long long arr[],int size, PyObject *args) {
 static PyObject *
 math_okek(PyObject *self, PyObject *args)
 {
-    const int TupleSize = PyTuple_Size(args);
-    int i;
-    struct bigcouples temp;
-    unsigned long long current;
+    Py_ssize_t TupleSize = PyTuple_Size(args);
+    Py_ssize_t i;
+    struct bigcouples *temp = malloc(sizeof(struct bigcouples));
+    unsigned long current;
+    
     if(!TupleSize) {
-        PyErr_SetString(PyExc_TypeError,"You must supply at least one argument.");
+        if(!PyErr_Occurred()) 
+            PyErr_SetString(PyExc_TypeError,"You must supply at least one argument.");
+        free(temp);
         return NULL;
     }
 
-    unsigned long long nums [TupleSize];
+    unsigned long *nums = malloc(TupleSize * sizeof(unsigned long));
 
-    if(!ParseArguments(nums, TupleSize, args))
-            return NULL;
+    if(!ParseArguments(nums, TupleSize, args)){
+        free(temp);
+        free(nums);
+        return NULL;
+    }
 
     bubbleSort(nums, TupleSize);
 
     current = nums[0];
 
     for (i = 1; i< TupleSize; i++) {
-        temp.first = current;
-        temp.second = nums[i];
-        current = okek_couples(temp);
+        temp->first = current;
+        temp->second = nums[i];
+        current = okek_couples(*temp);
+        if(!current) {return NULL;}
     }
-    return Py_BuildValue("K",current);
+
+    free(temp);
+    free(nums);
+    return Py_BuildValue("k",current);
 }
 
 
@@ -132,14 +147,14 @@ static PyObject *
 math_obeb(PyObject *self, PyObject *args) {
     PyObject *temp_p;
     struct bigcouples temp;
-    unsigned long long current;
-    int i;
-    const int TupleSize = PyTuple_Size(args);
+    unsigned long current;
+    Py_ssize_t i;
+    Py_ssize_t TupleSize = PyTuple_Size(args);
     if (!TupleSize) {
         PyErr_SetString(PyExc_TypeError,"You must supply at least one int or long object.");
         return NULL;
     }
-    unsigned long long nums [TupleSize];
+    unsigned long *nums = malloc(TupleSize * sizeof(unsigned long));
     
     if(!ParseArguments(nums, TupleSize, args))
             return NULL;
@@ -154,7 +169,7 @@ math_obeb(PyObject *self, PyObject *args) {
         if (current == 1)
             break;
     }
-    return Py_BuildValue("i",current); 
+    return Py_BuildValue("k",current); 
 }
 
 
@@ -203,7 +218,7 @@ math_primes(PyObject *self, PyObject *args)
 
     for(i=0;i<arr_size;i++){
         if (numbs[i])
-            if(PyList_Append(m,Py_BuildValue("k",numbs[i])) == -1) {
+            if(PyList_Append(m,Py_BuildValue("i",numbs[i])) == -1) {
             Py_DECREF(m);
             free(numbs);
             return NULL;
@@ -223,9 +238,9 @@ static PyMethodDef MathMethods [] = {
 };
 
 PyMODINIT_FUNC
-initmathGerecleri(void)
+init_mathGerecleri(void)
 {
     PyObject *m;
 
-    m = Py_InitModule("mathGerecleri", MathMethods);
+    m = Py_InitModule("_mathGerecleri", MathMethods);
 } 

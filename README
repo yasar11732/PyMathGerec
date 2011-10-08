@@ -1,32 +1,72 @@
-Python'da bazı metematik işlemleri için kısayol fonksiyonları.
-Çok denenmedi, pek güven olmayabilir.
-Hız açısından bir sanat eseri oldu gibi.
-Hafıza kullanımını optimize etmedim, ama çok sıkıntı çıkarmaz heralde.
+Python'da bazı metematik işlemleri için kısayol fonksiyonları. Daha geliştirmenin
+erken aşamalarında, dolayısıyla çok denemedi. Ama açıkcası çalışmaması için bir
+neden görmüyorum. Fonksiyonları oluştururken bir hayli verimli olmasına özen gösterdim.
+Bir kısım fonksiyonları doğrudan C ile uyguladım.
 
-Her sistem için uygun olmayabilir (bkz: -> windows <-) (ama çalışması da muhtemel.)
-C ile yazıldığı için, derlemek için C derleyicisi gerekecek (bkz: -> gcc <-)
+======= Gereksinimler ====
 
-Kurulum:
+Python 2.4 ve yukarısı yeterli olmalı. Windows üzerinde çalışmayabilir.
+
+
+======= KURULUM ====
+
+Kaynak Koddan:
+
+Kaynak kodlardan kurulum yapmak için bilgisayarınızda çalışan bir C derleyicisi
+gerekiyor. C derleyiciniz varsa şu komutla kurulum yapabilirsiniz.
 
 python setup.py install
+----------------------------------
+İkili Paketler:
 
-Kullanmak için:
+Şu anda ikili paket olarak dist içerisinde bulabileceğiniz arch-linux 32 bit ile derlediğim
+bir paket var. Ancak onu kurmanızı tavsiye etmiyorum. Daha diğer platformlarda derlenmedi.
+-----------------------------------
 
-Tek bir modülden oluşuyor, import etmek için:
 
-import mathGerecleri
+======== KULLANIMI ========
+
+Fonksiyonları import etmek için:
+
+from mataraclari import *
+--------------------------------------
 
 Fonksiyonlar:
 
-primes(int) -> argüman olarak 4milyondan küçük 1'den büyük bir sayı alıyor. (int-long)
-               o sayıya kadar olan asalları hesaplıyor. Benim makinede (eski laptop)
-               4 milyona kadar 0.2 saniye sürüyor hesaplaması. Bu arada dönüş değeri
-               her zaman long türünde.
+primes(int) -> Argüman olarak integer türünde bir sayı alıp o sayıya kadar olan asalları hesaplıyor.
+               Tek kullanım için gayet verimli, eski bir laptopda 100 milyona kadar olan asalları 
+               7sn'de hesapladı. Ancak, daha büyük sayılarda sıkıntı çıkarabilir. bu fonksiyonu bir
+               döngü içerisinde kullanmayın.
+               
+asalMi(int) -> argüman olarak verilen sayinin asallığını kontrol eder. Tek bir sayi kontrol etmek
+               için, yukarıdakine nazaran bir hayli verimlidir. Örneğin kendi bilgisayarımda 199999991
+               sayısına kadar olanları bulmak 14 saniye sürerken (kendi bilgisayarımda) bu sayının asal 
+               olduğunu bu fonksiyonla kontrol etmek saniyenin binde birinden daha kısa sürdü 
 
-obeb(int, int, ...) -> argüman olarak int veya long türünde rasgele miktarda argüman alıyor.
+obeb(int, int, ...) -> argüman olarak int türünde rasgele miktarda argüman alıyor.
                     sayılardan oluşan bir listeyi argüman olarak vermek için:
                     a = [23,543,12,54]
                     obeb(*a) # a'nın elemanları ayrı argümanlar olarak gönderir... 
-                    Dönüş değeri long türünde.
                     
-okek() -> yukardaki'nin okek'lisi.
+okek(int, int, ...) -> yukardaki'nin okek'lisi. Verilen argümanların okek'i bir hayli
+                       yüksek bir rakam çıkabileceğinden dikkatli kullanmakda yarar var.
+
+carpanlar(int) -> Verilen sayının tüm bölenlerini bulur, ama adı çarpanlar :)
+                  örn: carpanlar(100) -> [1,2,4,5,10,20,25,50,100] Benim bilgisayarımda
+                  10 haneleri olan sayılara kadar saniyenin binde birinden az sürede hesaplıyor.
+                  
+asalCarpanlar(int) -> verilen sayiyi asal carpanlarına ayırır. Dönen listedeki elemanların hepsi
+                      asal sayidir, ve bunların çarpımı ilk sayıyı verir.
+                      örn: asalCarpanlar(100) -> [2,2,5,5]
+                      
+TekilAsalCarpanlar(int) -> verilen sayıyı tam bölen asal sayılar kümesi.
+                           Örn: TekilAsalCarpanlar(100) -> [2,5]
+                           
+sadelestir(int, int, ...) -> verilen argümanların hepsini obeb'lerine bölerek bir liste döndürür.
+                             Örn: sadelestir(5,10,15,500) -> [1,2,3,100]
+                             
+EsitlemeKatsayilar(int,int,int, ...) -> Verilen sayilarin okek'ini bulup, okeki bu sayılara böler.
+                                        örn: EsitlemeKatsayilar(2,3,5,4) -> [30,20,12,15]
+                             
+
+                      
