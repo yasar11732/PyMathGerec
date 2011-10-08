@@ -6,9 +6,17 @@ Bir kısım fonksiyonları doğrudan C ile uyguladım.
 ======= Gereksinimler ====
 
 Python 2.4 ve yukarısı yeterli olmalı. Windows üzerinde çalışmayabilir.
+Derleyerek kurulumlarda C derleyicisi gereklidir. Şu anda ikili dağıtım
+olmadığını göz önünde bulundurursak, C derleyicisi edinseniz iyi olur :)
 
 
 ======= KURULUM ====
+
+Distutils / pip:
+
+easy_install mataraclari
+ *** VEYA ***
+pip install mataraclari
 
 Kaynak Koddan:
 
