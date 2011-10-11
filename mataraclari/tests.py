@@ -21,7 +21,7 @@
 
 """
 import unittest
-from _carpanlar import carpanlar, asalCarpanlar
+from __init__ import *
 from random import randint
 
 class carpanlarTests(unittest.TestCase):
@@ -45,6 +45,25 @@ class carpanlarTests(unittest.TestCase):
             self.assertEqual(sayi, sonuc)
 
 
+class asallarToplamiTests(unittest.TestCase):
+    asallar = primes(1000)
+
+    def testAsallarToplamiSanity(self):
+        for i in range(100):
+            girdi = 2 * randint(2,500)
+            asal1, asal2 = asallarToplami(girdi)
+            self.assertEqual(asal1 + asal2, girdi)
+            self.assertTrue(asal1 in self.asallar)
+            self.assertTrue(asal2 in self.asallar)
+
+    def testAsallarToplamiHepsiSanity(self):
+
+        for i in range(100):
+            girdi = 2  * randint(2,500)
+            for asal1, asal2 in asallarToplamiHepsi(girdi):
+                self.assertEqual(asal1 + asal2, girdi)
+                self.assertTrue(asal1 in self.asallar)
+                self.assertTrue(asal2 in self.asallar)
 if __name__ == "__main__":
     unittest.main()
 

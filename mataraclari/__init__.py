@@ -40,3 +40,40 @@ def asalMi(sayi):
             return False
 
     return True
+
+def asallarToplami(sayi):
+    """
+    Verilen çift sayiyi iki asalin toplami şeklinde
+    yazar. Eğer birden fazla asal toplam döndürülebiliyorsa,
+    yine de tek bir tane döndürür.
+    >>> asallarToplami(8)
+    (5,3)
+    >>> asallarToplami(10)
+    (7,3)
+    """
+
+    if sayi % 2 != 0:
+        raise ValueError(u"Çift sayı girmelisiniz.")
+
+    asallar = primes(sayi)
+
+    for i in asallar:
+        if sayi - i in asallar:
+            return (sayi - i, i)
+
+def asallarToplamiHepsi(sayi):
+
+    if sayi % 2 != 0:
+        raise ValueError("Çift sayı giriniz.")
+
+    asallar = primes(sayi)
+    toplamlar = []
+
+    yarisi = len(asallar) / 2
+
+    for i in range(yarisi + 1):
+        asal = asallar[i]
+        if sayi - asal in asallar:
+            toplamlar.append((sayi-asal, asal))
+
+    return toplamlar

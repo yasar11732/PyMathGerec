@@ -16,7 +16,7 @@ yet no other documentation is available, but this may change in future."""
 
 setup(
     name="mataraclari",
-    version = '0.12',
+    version = '0.13',
     description = 'Provides some math utilities',
     author = 'Yaşar Arabacı',
     author_email = 'yasar11732@gmail.com',
